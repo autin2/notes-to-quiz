@@ -268,7 +268,7 @@
 	  
 	  showLoading();
 
-	  const res = await fetch('/quiz.js', {
+	  const res = await fetch('quiz.js', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ notes }),
