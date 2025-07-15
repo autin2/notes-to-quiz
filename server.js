@@ -2,31 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const OpenAI = require('openai');
-const session = require('express-session');  // <-- add this
-const { Pool } = require('pg');               // <-- add this
-
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // needed if your DB requires SSL (common on Render)
-  },
-});
-
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 
 const app = express();
 app.use(bodyParser.json());
-
-// Add session middleware here:
-app.use(session({
-  secret: process.env.SESSION_SECRET,   // <-- your secret string in env
-  resave: false,
-  saveUninitialized: false,
-}));
-
 
 // Serve index.html on root URL
 app.get('/', (req, res) => {
@@ -113,48 +94,6 @@ Return only the subject as plain text.
     res.status(500).json({ error: 'Failed to detect subject.' });
   }
 });
-
-const bcrypt = require('bcrypt');
-
-// Register
-app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-  try {
-    const hash = await bcrypt.hash(password, 10);
-    await pool.query('INSERT INTO users (email, password_hash) VALUES ($1, $2)', [email, hash]);
-    res.json({ success: true });
-  } catch (err) {
-    if (err.code === '23505') { // unique_violation
-      res.status(400).json({ error: 'Email already registered' });
-    } else {
-      console.error(err);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  }
-});
-
-// Login
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-
-  try {
-    const result = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
-    const user = result.rows[0];
-    if (!user) return res.status(400).json({ error: 'Invalid email or password' });
-
-    const match = await bcrypt.compare(password, user.password_hash);
-    if (!match) return res.status(400).json({ error: 'Invalid email or password' });
-
-    req.session.userId = user.id;
-    res.json({ success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));
