@@ -318,35 +318,81 @@
 
 	
     async function generateQuiz() {
-	  const notes = document.getElementById('notes').value.trim();
-	  if (!notes) {
-		alert('Please paste some notes first.');
-		return;
-	  }
-	  
-	  showLoading();
+  const notes = document.getElementById('notes').value.trim();
+  if (!notes) {
+    alert('Please paste some notes first.');
+    return;
+  }
 
-	  const res = await fetch('/api/quiz', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, count: selectedCount }),
-    });
+  showLoading();
 
-	  hideLoading();
+  // Generate quiz
+  const res = await fetch('/api/quiz', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notes, count: selectedCount }),
+  });
 
-	  const data = await res.json();
-	  if (data.error) {
-		alert('Error: ' + data.error);
-		return;
-	  }
+  if (!res.ok) {
+    hideLoading();
+    alert('Failed to generate quiz');
+    return;
+  }
 
-	  quizData = data.quiz;
-	  currentQuestionIndex = 0;
-	  score = 0;
-	  correctCount = 0;
-	  totalCount = quizData.length;
-	  showQuestion();
-	}
+  const data = await res.json();
+  if (data.error) {
+    hideLoading();
+    alert('Error: ' + data.error);
+    return;
+  }
+
+  quizData = data.quiz;
+  currentQuestionIndex = 0;
+  score = 0;
+  correctCount = 0;
+  totalCount = quizData.length;
+
+  // Call subject detection API
+  const subjectRes = await fetch('/api/subject', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notes }),
+  });
+
+  let subject = '';
+  if (subjectRes.ok) {
+    const subjectData = await subjectRes.json();
+    subject = subjectData.subject || '';
+  }
+
+  hideLoading();
+  showQuestion();
+
+  // Show affiliate link below quiz container
+  const quizContainer = document.getElementById('quiz-container');
+  if (subject) {
+    const affiliateLink = generateAmazonAffiliateLink(subject);
+    const linkHTML = `
+      <p style="margin-top:20px;">
+        Looking for study guides on <strong>${subject}</strong>?  
+        <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" style="color:#8e44ad;">
+          Check out these books on Amazon
+        </a>
+      </p>
+    `;
+    quizContainer.insertAdjacentHTML('beforeend', linkHTML);
+  }
+}
+
+// Affiliate link generator function (add this outside your functions)
+function generateAmazonAffiliateLink(subject) {
+  const baseUrl = 'https://www.amazon.com/s';
+  const params = new URLSearchParams({
+    k: `${subject} study guide`,
+    tag: 'youraffiliate-20', // replace with your Amazon Associate tag
+  });
+  return `${baseUrl}?${params.toString()}`;
+}
 
 
 	
