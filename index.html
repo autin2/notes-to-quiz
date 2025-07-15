@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+
+  <title>Flashcard Quiz AI</title>
+
+  <style>
+  
+	.pyramid-loader {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: block;
+  transform-style: preserve-3d;
+  transform: rotateX(-20deg);
+}
+
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.pyramid-loader .wrapper .side {
+  width: 70px;
+  height: 70px;
+/* you can choose any gradient or color you want */
+  /* background: radial-gradient( #2F2585 10%, #F028FD 70%, #2BDEAC 120%); */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  transform-origin: center top;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.pyramid-loader .wrapper .side1 {
+  transform: rotateZ(-30deg) rotateY(90deg);
+  background: conic-gradient( #2BDEAC, #F028FD, #D8CCE6, #2F2585);
+}
+
+.pyramid-loader .wrapper .side2 {
+  transform: rotateZ(30deg) rotateY(90deg);
+  background: conic-gradient( #2F2585, #D8CCE6, #F028FD, #2BDEAC);
+}
+
+.pyramid-loader .wrapper .side3 {
+  transform: rotateX(30deg);
+  background: conic-gradient( #2F2585, #D8CCE6, #F028FD, #2BDEAC);
+}
+
+.pyramid-loader .wrapper .side4 {
+  transform: rotateX(-30deg);
+  background: conic-gradient( #2BDEAC, #F028FD, #D8CCE6, #2F2585);
+}
+
+.pyramid-loader .wrapper .shadow {
+  width: 60px;
+  height: 60px;
+  background: #8B5AD5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  transform: rotateX(90deg) translateZ(-40px);
+  filter: blur(12px);
+}
+  
+  
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+      background: #121212;
+      color: #f0f0f0;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      font-size: 16px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      background-color: #000;
+      color: #fff;
+      resize: vertical;
+    }
+	button {
+	  margin: 5px;
+	  padding: 10px 15px;
+	  font-size: 16px;
+	  cursor: pointer;
+	  border-radius: 5px;
+	  border: none;
+	  background-color: #8e44ad; /* vibrant purple */
+	  color: white;
+	  transition: background-color 0.3s ease;
+	}
+
+	button:hover {
+	  background-color: #732d91; /* darker purple on hover */
+	}
+	
+	#blur-overlay {
+	  position: fixed;
+	  inset: 0;
+	  background: rgba(30, 30, 30, 0.8);
+	  backdrop-filter: blur(10px);
+	  display: flex;
+	  justify-content: center;  /* center horizontally */
+	  align-items: center;      /* center vertically */
+	  opacity: 0;
+	  pointer-events: none;
+	  transition: opacity 0.3s ease;
+	  z-index: 9999;
+	}
+
+
+	#blur-overlay.active {
+	  backdrop-filter: blur(6px);
+	  background: rgba(0, 0, 0, 0.6);
+	  opacity: 1;
+	  pointer-events: all;
+	}
+
+	
+	#retry-btn {
+	  margin-top: 20px;
+	  padding: 10px 15px;
+	  font-size: 16px;
+	  cursor: pointer;
+	  border-radius: 5px;
+	  border: none;
+	  background-color: #8e44ad; /* vibrant purple */
+	  color: white;
+	  transition: background-color 0.3s ease;
+	}
+
+	#retry-btn:hover {
+	  background-color: #732d91; /* darker purple on hover */
+	}
+	
+
+    .flashcard {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    /* Your custom generate button style */
+    .flex {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .outer-cont {
+      padding: 12px 20px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      background: linear-gradient(90deg, #5bfcc4, #f593e4, #71a4f0);
+      border-radius: 12px;
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow:
+        inset 0px 0px 5px #ffffffa9,
+        inset 0px 35px 30px #000,
+        0px 5px 10px #000000cc;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .outer-cont::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      border-radius: 12px;
+      filter: blur(0);
+      z-index: -1;
+      box-shadow: none;
+      background: conic-gradient(
+        #00000000 80deg,
+        #40baf7,
+        #f34ad7,
+        #5bfcc4,
+        #00000000 280deg
+      );
+      transition: all 0.3s ease;
+    }
+    .outer-cont:hover::before {
+      filter: blur(15px);
+    }
+    .outer-cont:active::before {
+      filter: blur(5px);
+      transform: translateY(1px);
+    }
+    .outer-cont:active {
+      box-shadow:
+        inset 0px 0px 5px #ffffffa9,
+        inset 0px 35px 30px #000;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+<div id="blur-overlay">
+  <div class="pyramid-loader">
+    <div class="wrapper">
+      <div class="side side1"></div>
+      <div class="side side2"></div>
+      <div class="side side3"></div>
+      <div class="side side4"></div>
+      <div class="shadow"></div>
+    </div>
+  </div>
+</div>
+
+
+ <h1>Notes To Quiz AI</h1>
+
+  <textarea id="notes" placeholder="Paste your notes here..."></textarea>
+  <button class="outer-cont" onclick="generateQuiz()">Generate Quiz</button>
+
+  <div id="quiz-container"></div>
+
+  <script>
+    let currentQuestionIndex = 0;
+    let quizData = [];
+    let feedbackTimeout;
+    let score = 0;
+    let correctCount = 0;
+    let totalCount = 0;
+	
+	function showLoading() {
+		document.getElementById('blur-overlay').classList.add('active');
+	}
+
+	function hideLoading() {
+	  document.getElementById('blur-overlay').classList.remove('active');
+	}
+
+	
+    async function generateQuiz() {
+	  const notes = document.getElementById('notes').value.trim();
+	  if (!notes) {
+		alert('Please paste some notes first.');
+		return;
+	  }
+	  
+	  showLoading();
+
+	  const res = await fetch('/api/quiz', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ notes }),
+	  });
+
+	  hideLoading();
+
+	  const data = await res.json();
+	  if (data.error) {
+		alert('Error: ' + data.error);
+		return;
+	  }
+
+	  quizData = data.quiz;
+	  currentQuestionIndex = 0;
+	  score = 0;
+	  correctCount = 0;
+	  totalCount = quizData.length;
+	  showQuestion();
+	}
+
+
+	
+    function showQuestion() {
+      if (currentQuestionIndex >= quizData.length) {
+		const percent = Math.round((score / (totalCount * 20)) * 100);
+		document.getElementById('quiz-container').innerHTML = `
+		<h2>🎉 Quiz Complete!</h2>
+		<p>✅ Correct: ${correctCount}</p>
+		<p>❌ Incorrect: ${totalCount - correctCount}</p>
+		<p>🏆 Score: ${percent} / 100</p>
+		<button id="retry-btn" onclick="retryQuiz()">Retry</button>
+		`;
+		return;
+	}
+
+
+      const q = quizData[currentQuestionIndex];
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = `
+        <div class="flashcard">
+          <h3>Question ${currentQuestionIndex + 1} of ${totalCount}</h3>
+          <p>${q.question}</p>
+          <div id="choices">
+            ${q.choices.map(choice =>
+              `<button onclick="checkAnswer('${choice}', this)">${choice}</button>`
+            ).join('')}
+          </div>
+          <p id="feedback" style="font-weight:bold; margin-top:10px;"></p>
+        </div>
+      `;
+    }
+
+    function checkAnswer(selected, button) {
+      clearTimeout(feedbackTimeout);
+      const q = quizData[currentQuestionIndex];
+      const feedbackEl = document.getElementById('feedback');
+
+      if (selected === q.answer) {
+        feedbackEl.textContent = '✅ Correct!';
+        feedbackEl.style.color = 'green';
+        score += 20; // 5 questions × 20 = 100
+        correctCount++;
+      } else {
+        feedbackEl.textContent = `❌ Wrong! Correct answer: ${q.answer}`;
+        feedbackEl.style.color = 'red';
+      }
+
+      // Disable all buttons after answering
+      const buttons = document.querySelectorAll('#choices button');
+      buttons.forEach(btn => btn.disabled = true);
+
+      // Move to next question automatically after 2 seconds
+      feedbackTimeout = setTimeout(() => {
+        currentQuestionIndex++;
+        showQuestion();
+      }, 2000);
+    }
+  </script>
+
+</body>
+</html>
