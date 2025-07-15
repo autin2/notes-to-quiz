@@ -252,28 +252,8 @@
   </div>
 </div>
 
-<div id="auth-container">
-  <h2>Login / Register</h2>
-  
-  <form id="login-form">
-    <input type="email" id="login-email" placeholder="Email" required />
-    <input type="password" id="login-password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
-  
-  <form id="register-form" style="margin-top:20px;">
-    <input type="email" id="register-email" placeholder="Email" required />
-    <input type="password" id="register-password" placeholder="Password" required />
-    <button type="submit">Register</button>
-  </form>
-  
-  <p id="auth-message" style="color:red;"></p>
-</div>
-
 <h1>Notes To Quiz AI</h1>
-
 <textarea id="notes" placeholder="Paste your notes here..."></textarea>
-
 
 <div class="flex">
   <button class="outer-cont" onclick="generateQuiz()">Generate Quiz</button>
@@ -310,56 +290,11 @@
     let score = 0;
     let correctCount = 0;
     let totalCount = 0;
+
+
 	
 	  
-	const authMessage = document.getElementById('auth-message');
-
-document.getElementById('login-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-
-  const res = await fetch('/login', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ email, password }),
-  });
-
-  const data = await res.json();
-  if (data.success) {
-    authMessage.style.color = 'green';
-    authMessage.textContent = 'Login successful!';
-    location.reload();  // reload to update UI or fetch protected content
-  } else {
-    authMessage.style.color = 'red';
-    authMessage.textContent = data.error || 'Login failed.';
-  }
-});
-
-document.getElementById('register-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = document.getElementById('register-email').value;
-  const password = document.getElementById('register-password').value;
-
-  const res = await fetch('/register', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ email, password }),
-  });
-
-  const data = await res.json();
-  if (data.success) {
-    authMessage.style.color = 'green';
-    authMessage.textContent = 'Registration successful! Please log in.';
-  } else {
-    authMessage.style.color = 'red';
-    authMessage.textContent = data.error || 'Registration failed.';
-  }
-});
-
-
-
-	  
+	
 	function showLoading() {
 		document.getElementById('blur-overlay').classList.add('active');
 	}
@@ -390,7 +325,6 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   }
 
   showLoading();
-	    
 
   // Generate quiz
   const res = await fetch('/api/quiz', {
