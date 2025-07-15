@@ -6,6 +6,14 @@ const session = require('express-session');  // <-- add this
 const { Pool } = require('pg');               // <-- add this
 
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // needed if your DB requires SSL (common on Render)
+  },
+});
+
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 
