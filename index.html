@@ -153,6 +153,19 @@
 	  pointer-events: all;
 	}
 
+	.main-container {
+	  display: flex;
+	  align-items: flex-start;
+	  gap: 30px;
+	  margin-top: 20px;
+	}
+	
+	.content-area {
+	  flex: 1;
+	  max-width: 700px;
+	}
+
+	  
 	
 	#retry-btn {
 	  margin-top: 20px;
@@ -248,27 +261,32 @@
 </div>
 
 
- <h1>Notes To Quiz AI</h1>
+ <div class="main-container">
+  <div class="card">
+    <h2>Quiz AI</h2>
+  </div>
 
-  <textarea id="notes" placeholder="Paste your notes here..."></textarea>
-  
- <div class="flex">
-  <button class="outer-cont" onclick="generateQuiz()">Generate Quiz</button>
-  <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
-    <span style="font-size: 14px; color: #ccc;"># of Questions:</span>
-    <div id="question-count-buttons" style="display: flex; gap: 6px;">
-      <button onclick="setQuestionCount(5)">5</button>
-      <button onclick="setQuestionCount(10)">10</button>
-      <button onclick="setQuestionCount(15)">15</button>
-      <button onclick="setQuestionCount(20)">20</button>
-      <button onclick="setQuestionCount(25)">25</button>
+  <div class="content-area">
+    <h1>Notes To Quiz AI</h1>
+
+    <textarea id="notes" placeholder="Paste your notes here..."></textarea>
+    <div class="flex">
+      <button class="outer-cont" onclick="generateQuiz()">Generate Quiz</button>
+      <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+        <span style="font-size: 14px; color: #ccc;"># of Questions:</span>
+        <div id="question-count-buttons" style="display: flex; gap: 6px;">
+          <button onclick="setQuestionCount(5)">5</button>
+          <button onclick="setQuestionCount(10)">10</button>
+          <button onclick="setQuestionCount(15)">15</button>
+          <button onclick="setQuestionCount(20)">20</button>
+          <button onclick="setQuestionCount(25)">25</button>
+        </div>
+      </div>
     </div>
+    <div id="quiz-container"></div>
   </div>
 </div>
 
-
-
-  <div id="quiz-container"></div>
 
   <script type="module">
   import confetti from 'https://cdn.skypack.dev/canvas-confetti';
