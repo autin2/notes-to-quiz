@@ -269,6 +269,18 @@
 	  document.getElementById('blur-overlay').classList.remove('active');
 	}
 
+	 let selectedCount = 5; // Default to 5 questions
+	
+	function setQuestionCount(n) {
+	  selectedCount = n;
+	  document.querySelectorAll('#question-count-buttons button').forEach(btn => {
+	    btn.classList.remove('selected');
+	    if (parseInt(btn.textContent) === n) {
+	      btn.classList.add('selected');
+	    }
+	  });
+	}
+
 	
     async function generateQuiz() {
 	  const notes = document.getElementById('notes').value.trim();
@@ -282,7 +294,7 @@
 	  const res = await fetch('/api/quiz', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes }),
+      body: JSON.stringify({ notes, count: selectedCount }),
     });
 
 	  hideLoading();
