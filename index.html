@@ -8,7 +8,20 @@
   <title>Flashcard Quiz AI</title>
 
   <style>
-  
+
+#question-count-buttons button {
+  background: #333;
+  border: 1px solid #555;
+  color: white;
+}
+#question-count-buttons button.selected {
+  background: #8e44ad;
+  border: 1px solid #8e44ad;
+}
+
+
+
+	  
 	.pyramid-loader {
   position: relative;
   width: 300px;
@@ -272,14 +285,15 @@
 	 let selectedCount = 5; // Default to 5 questions
 	
 	function setQuestionCount(n) {
-	  selectedCount = n;
-	  document.querySelectorAll('#question-count-buttons button').forEach(btn => {
-	    btn.classList.remove('selected');
-	    if (parseInt(btn.textContent) === n) {
-	      btn.classList.add('selected');
-	    }
-	  });
-	}
+  selectedCount = n;
+  document.querySelectorAll('#question-count-buttons button').forEach(btn => {
+    btn.classList.remove('selected');
+    if (parseInt(btn.textContent) === n) {
+      btn.classList.add('selected');
+    }
+  });
+}
+
 
 	
     async function generateQuiz() {
