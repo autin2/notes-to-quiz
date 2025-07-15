@@ -153,11 +153,12 @@
 	  pointer-events: all;
 	}
 
-	.main-container {
-  display: flex;
-  align-items: flex-start;
-  gap: 30px;
-  margin-top: 20px;
+.floating-card {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  z-index: 10;
 }
 
 .card {
@@ -206,10 +207,6 @@
   }
 }
 
-.content-area {
-  flex: 1;
-  max-width: 700px;
-}
 
 
 	  
@@ -307,6 +304,13 @@
   </div>
 </div>
 
+<!-- FLOATING CARD OUTSIDE OF MAIN LAYOUT -->
+<div class="floating-card">
+  <div class="card">
+    <h2>Quiz AI</h2>
+  </div>
+</div>
+	
 
 <div class="main-container">
   <div class="card">
