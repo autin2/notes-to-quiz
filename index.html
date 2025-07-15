@@ -270,6 +270,12 @@
 
   <div id="quiz-container"></div>
 
+  <script type="module">
+  import confetti from 'https://cdn.skypack.dev/canvas-confetti';
+  window.confetti = confetti; // expose globally
+</script>
+
+	
   <script>
     let currentQuestionIndex = 0;
     let quizData = [];
@@ -277,6 +283,10 @@
     let score = 0;
     let correctCount = 0;
     let totalCount = 0;
+
+
+	
+	  
 	
 	function showLoading() {
 		document.getElementById('blur-overlay').classList.add('active');
@@ -335,12 +345,17 @@
 	
     function showQuestion() {
       if (currentQuestionIndex >= quizData.length) {
-		const percent = Math.round((score / (totalCount * 20)) * 100);
+ 	 const percent = Math.round((score / (totalCount * 20)) * 100); 
+		  if (percent >= 70 && window.confetti) {
+		    confetti();
+		  }
 		document.getElementById('quiz-container').innerHTML = `
 		<h2>🎉 Quiz Complete!</h2>
 		<p>✅ Correct: ${correctCount}</p>
 		<p>❌ Incorrect: ${totalCount - correctCount}</p>
 		<p>🏆 Score: ${percent} / 100</p>
+		
+  
 		<button id="retry-btn" onclick="retryQuiz()">Retry</button>
 		`;
 		return;
