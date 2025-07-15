@@ -252,16 +252,20 @@
 
   <textarea id="notes" placeholder="Paste your notes here..."></textarea>
   
-  <div class="flex">
+ <div class="flex">
   <button class="outer-cont" onclick="generateQuiz()">Generate Quiz</button>
-  <div id="question-count-buttons" style="display: flex; gap: 6px; margin-left: 10px;">
-    <button onclick="setQuestionCount(5)">5</button>
-    <button onclick="setQuestionCount(10)">10</button>
-    <button onclick="setQuestionCount(15)">15</button>
-    <button onclick="setQuestionCount(20)">20</button>
-    <button onclick="setQuestionCount(25)">25</button>
+  <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+    <span style="font-size: 14px; color: #ccc;"># of Questions:</span>
+    <div id="question-count-buttons" style="display: flex; gap: 6px;">
+      <button onclick="setQuestionCount(5)">5</button>
+      <button onclick="setQuestionCount(10)">10</button>
+      <button onclick="setQuestionCount(15)">15</button>
+      <button onclick="setQuestionCount(20)">20</button>
+      <button onclick="setQuestionCount(25)">25</button>
+    </div>
   </div>
 </div>
+
 
 
   <div id="quiz-container"></div>
