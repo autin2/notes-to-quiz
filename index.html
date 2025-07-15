@@ -153,17 +153,52 @@
 	  pointer-events: all;
 	}
 
-	.main-container {
-	  display: flex;
-	  align-items: flex-start;
-	  gap: 30px;
-	  margin-top: 20px;
-	}
-	
-	.content-area {
-	  flex: 1;
-	  max-width: 700px;
-	}
+	.card {
+  width: 190px;
+  height: 254px;
+  background: #07182E;
+  position: relative;
+  display: flex;
+  place-content: center;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.card h2 {
+  z-index: 1;
+  color: white;
+  font-size: 2em;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  height: 130%;
+  animation: rotBGimg 3s linear infinite;
+  transition: all 0.2s linear;
+}
+
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  background: #07182E;
+  inset: 5px;
+  border-radius: 15px;
+}
+
 
 	  
 	
@@ -261,14 +296,13 @@
 </div>
 
 
- <div class="main-container">
+<div class="main-container">
   <div class="card">
     <h2>Quiz AI</h2>
   </div>
 
   <div class="content-area">
     <h1>Notes To Quiz AI</h1>
-
     <textarea id="notes" placeholder="Paste your notes here..."></textarea>
     <div class="flex">
       <button class="outer-cont" onclick="generateQuiz()">Generate Quiz</button>
@@ -286,6 +320,7 @@
     <div id="quiz-container"></div>
   </div>
 </div>
+
 
 
   <script type="module">
