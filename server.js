@@ -2,12 +2,23 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const OpenAI = require('openai');
+const session = require('express-session');  // <-- add this
+const { Pool } = require('pg');               // <-- add this
+
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 
 const app = express();
 app.use(bodyParser.json());
+
+// Add session middleware here:
+app.use(session({
+  secret: process.env.SESSION_SECRET,   // <-- your secret string in env
+  resave: false,
+  saveUninitialized: false,
+}));
+
 
 // Serve index.html on root URL
 app.get('/', (req, res) => {
