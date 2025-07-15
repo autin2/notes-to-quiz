@@ -36,11 +36,12 @@ function shuffleChoices(quiz) {
 }
 
 app.post('/api/quiz', async (req, res) => {
-  const { notes } = req.body;
+  const { notes, count } = req.body;
+
   console.log('Notes received:', notes);
 
   const prompt = `
-Generate a JSON array with exactly 5 multiple choice questions based on these notes.
+Generate a JSON array with exactly ${count} multiple choice questions based on these notes.
 Each question must have:
 - "question": string
 - "choices": array of 4 strings
@@ -51,6 +52,7 @@ Return only valid JSON, nothing else.
 NOTES:
 ${notes}
 `;
+
 
   try {
     const completion = await openai.chat.completions.create({
