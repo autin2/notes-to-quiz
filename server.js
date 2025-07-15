@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const OpenAI = require('openai');
 
-const openai = new OpenAI({ apiKey: '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' });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
 app.use(bodyParser.json());
