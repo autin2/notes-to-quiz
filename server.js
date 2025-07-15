@@ -71,4 +71,29 @@ ${notes}
   }
 });
 
+app.post('/api/subject', async (req, res) => {
+  const { notes } = req.body;
+
+  const prompt = `
+Read these notes and return a concise subject/topic name for them (e.g. "Organic Chemistry", "World History", "Calculus", etc.):
+
+${notes}
+
+Return only the subject as plain text.
+`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const subject = completion.choices[0].message.content.trim();
+    res.json({ subject });
+  } catch (e) {
+    console.error('Subject detection error:', e);
+    res.status(500).json({ error: 'Failed to detect subject.' });
+  }
+});
+
+
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));
