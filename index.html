@@ -153,7 +153,14 @@
 	  pointer-events: all;
 	}
 
-	.card {
+	.main-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.card {
   width: 190px;
   height: 254px;
   background: #07182E;
@@ -163,6 +170,7 @@
   place-items: center;
   overflow: hidden;
   border-radius: 20px;
+  flex-shrink: 0;
 }
 
 .card h2 {
@@ -181,22 +189,26 @@
   transition: all 0.2s linear;
 }
 
-@keyframes rotBGimg {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .card::after {
   content: '';
   position: absolute;
   background: #07182E;
   inset: 5px;
   border-radius: 15px;
+}
+
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.content-area {
+  flex: 1;
+  max-width: 700px;
 }
 
 
@@ -303,7 +315,9 @@
 
   <div class="content-area">
     <h1>Notes To Quiz AI</h1>
+
     <textarea id="notes" placeholder="Paste your notes here..."></textarea>
+
     <div class="flex">
       <button class="outer-cont" onclick="generateQuiz()">Generate Quiz</button>
       <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
@@ -317,9 +331,11 @@
         </div>
       </div>
     </div>
+
     <div id="quiz-container"></div>
   </div>
 </div>
+
 
 
 
