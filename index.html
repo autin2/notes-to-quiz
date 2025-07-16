@@ -297,7 +297,13 @@
 
 
 	
-	  
+function retryQuiz() {
+	currentQuestionIndex = 0;
+	score = 0;
+	correctCount = 0;
+	// totalCount stays the same
+  showQuestion();
+	}
 	
 	function showLoading() {
 		document.getElementById('blur-overlay').classList.add('active');
@@ -438,13 +444,6 @@ function generateAmazonAffiliateLink(subject) {
       `;
     } 
 
- function retryQuiz() {
-	currentQuestionIndex = 0;
-	score = 0;
-	correctCount = 0;
-	// totalCount stays the same
-  showQuestion();
-	}
 
 	  
     function checkAnswer(selected, button) {
