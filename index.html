@@ -398,7 +398,7 @@ function generateAmazonAffiliateLink(subject) {
   return `${baseUrl}?${params.toString()}`;
 }
 
-
+	  
 	
     function showQuestion() {
       if (currentQuestionIndex >= quizData.length) {
@@ -419,6 +419,9 @@ function generateAmazonAffiliateLink(subject) {
 	}
 
 
+      
+
+	    
       const q = quizData[currentQuestionIndex];
       const container = document.getElementById('quiz-container');
       container.innerHTML = `
@@ -433,8 +436,17 @@ function generateAmazonAffiliateLink(subject) {
           <p id="feedback" style="font-weight:bold; margin-top:10px;"></p>
         </div>
       `;
-    }
+    } 
 
+ function retryQuiz() {
+	currentQuestionIndex = 0;
+	score = 0;
+	correctCount = 0;
+	// totalCount stays the same
+  showQuestion();
+	}
+
+	  
     function checkAnswer(selected, button) {
       clearTimeout(feedbackTimeout);
       const q = quizData[currentQuestionIndex];
