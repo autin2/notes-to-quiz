@@ -378,20 +378,20 @@ function retryQuiz() {
   hideLoading();
   showQuestion();
 
-  // Show affiliate link below quiz container
-  const quizContainer = document.getElementById('quiz-container');
-  if (subject) {
-    const affiliateLink = generateAmazonAffiliateLink(subject);
-    const linkHTML = `
-      <p style="margin-top:20px;">
-        Looking for study guides on <strong>${subject}</strong>?  
-        <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" style="color:#8e44ad;">
-          Check out these books on Amazon
-        </a>
-      </p>
-    `;
-    quizContainer.insertAdjacentHTML('beforeend', linkHTML);
-  }
+  // Set affiliate link in permanent section
+if (subject) {
+  const affiliateLink = generateAmazonAffiliateLink(subject);
+  const linkHTML = `
+    <p>
+      Looking for study guides on <strong>${subject}</strong>?  
+      <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" style="color:#8e44ad;">
+        Check out these books on Amazon
+      </a>
+    </p>
+  `;
+  document.getElementById('study-guide-link').innerHTML = linkHTML;
+}
+
 }
 
 // Affiliate link generator function (add this outside your functions)
@@ -472,6 +472,8 @@ function generateAmazonAffiliateLink(subject) {
       }, 2000);
     }
   </script>
+
+<div id="study-guide-link" style="margin-top: 20px;"></div>
 
 </body>
 </html>
