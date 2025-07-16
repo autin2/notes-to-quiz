@@ -8,6 +8,8 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname)));
+
 
 // Serve index.html on root URL
 app.get('/', (req, res) => {
