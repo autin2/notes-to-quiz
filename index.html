@@ -282,264 +282,202 @@
 
 
 
-  <script type="module">
+<script type="module">
   import confetti from 'https://cdn.skypack.dev/canvas-confetti';
   window.confetti = confetti; // expose globally
 </script>
 
-	
-  <script>
-    let currentQuestionIndex = 0;
-    let quizData = [];
-    let feedbackTimeout;
-    let score = 0;
-    let correctCount = 0;
-    let totalCount = 0;
-    let lastNotes = "";
+<script>
+  let currentQuestionIndex = 0;
+  let quizData = [];
+  let feedbackTimeout;
+  let score = 0;
+  let correctCount = 0;
+  let totalCount = 0;
+  let lastNotes = "";
+  let selectedCount = 5; // Default question count
 
-
-	
-function retryQuiz() {
-	currentQuestionIndex = 0;
-	score = 0;
-	correctCount = 0;
-	// totalCount stays the same
-  showQuestion();
-	}
-	
-	function showLoading() {
-		document.getElementById('blur-overlay').classList.add('active');
-	}
-
-	function hideLoading() {
-	  document.getElementById('blur-overlay').classList.remove('active');
-	}
-
-	 let selectedCount = 5; // Default to 5 questions
-	
-	function setQuestionCount(n) {
-  selectedCount = n;
-  document.querySelectorAll('#question-count-buttons button').forEach(btn => {
-    btn.classList.remove('selected');
-    if (parseInt(btn.textContent) === n) {
-      btn.classList.add('selected');
-    }
-  });
-}
-
-
-	
-async function generateQuiz() {
-  const notes = document.getElementById('notes').value.trim();
-  if (!notes) {
-    alert('Please paste some notes first.');
-    return;
-  }
-
-  showLoading();
-
-  try {
-    const res = await fetch('/api/quiz', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, count: selectedCount }),
+  window.setQuestionCount = function(n) {
+    selectedCount = n;
+    document.querySelectorAll('#question-count-buttons button').forEach(btn => {
+      btn.classList.remove('selected');
+      if (parseInt(btn.textContent) === n) {
+        btn.classList.add('selected');
+      }
     });
+  };
 
-    if (!res.ok) {
-      hideLoading();
-      alert('Failed to generate quiz');
-      return;
-    }
-
-    const data = await res.json();
-    if (data.error) {
-      hideLoading();
-      alert('Error: ' + data.error);
-      return;
-    }
-
-    quizData = data.quiz;
+  window.retryQuiz = function() {
     currentQuestionIndex = 0;
     score = 0;
     correctCount = 0;
-    totalCount = quizData.length;
-
-    // Optionally get subject & show affiliate link (if you want)
-    const subjectRes = await fetch('/api/subject', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes }),
-    });
-
-    let subject = '';
-    if (subjectRes.ok) {
-      const subjectData = await subjectRes.json();
-      subject = subjectData.subject || '';
-    }
-
-    hideLoading();
     showQuestion();
-
-    if (subject) {
-      const affiliateLink = generateAmazonAffiliateLink(subject);
-      document.getElementById('study-guide-link').innerHTML = `
-        <p>
-          Looking for study guides on <strong>${subject}</strong>?
-          <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" style="color:#8e44ad;">
-            Check out these books on Amazon
-          </a>
-        </p>
-      `;
-    } else {
-      document.getElementById('study-guide-link').innerHTML = '';
-    }
-  } catch (err) {
-    hideLoading();
-    alert('There was an error generating the quiz.');
-    console.error(err);
-  }
-}
-
-
-
-  quizData = data.quiz;
-  currentQuestionIndex = 0;
-  score = 0;
-  correctCount = 0;
-  totalCount = quizData.length;
-
-  // Call subject detection API
-  const subjectRes = await fetch('/api/subject', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ notes }),
-  });
-
-  let subject = '';
-  if (subjectRes.ok) {
-    const subjectData = await subjectRes.json();
-    subject = subjectData.subject || '';
-  }
-
-  hideLoading();
-  showQuestion();
-
-  // Set affiliate link in permanent section
-if (subject) {
-  const affiliateLink = generateAmazonAffiliateLink(subject);
-  const linkHTML = `
-    <p>
-      Looking for study guides on <strong>${subject}</strong>?  
-      <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" style="color:#8e44ad;">
-        Check out these books on Amazon
-      </a>
-    </p>
-  `;
-  document.getElementById('study-guide-link').innerHTML = linkHTML;
-}
-
-}
-
-// Affiliate link generator function (add this outside your functions)
-function generateAmazonAffiliateLink(subject) {
-  const baseUrl = 'https://www.amazon.com/s';
-  const params = new URLSearchParams({
-    k: `${subject} study guide`,
-    tag: 'clamtour-20', // replace with your Amazon Associate tag
-  });
-  return `${baseUrl}?${params.toString()}`;
-}
-
-
-	  function downloadPDF() {
-  const element = document.getElementById('results');
-  const opt = {
-    margin:       0.5,
-    filename:     'quiz-results.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
   };
-  html2pdf().from(element).set(opt).save();
-}
 
-	  
-	  
-	
-    function showQuestion() {
-  if (currentQuestionIndex >= quizData.length) {
-    const percent = Math.round((score / (totalCount * 20)) * 100); 
-
-    if (percent >= 70 && window.confetti) {
-      confetti();
-    }
-
-    document.getElementById('quiz-container').innerHTML = `
-      <div id="results">
-        <h2>🎉 Quiz Complete!</h2>
-        <p>✅ Correct: ${correctCount}</p>
-        <p>❌ Incorrect: ${totalCount - correctCount}</p>
-        <p>🏆 Score: ${percent} / 100</p>
-      </div>
-
-      <button id="retry-btn" onclick="retryQuiz()">Retry</button>
-      <button onclick="downloadPDF()">📄 Download Results</button>
-    `;
-    return;
+  function showLoading() {
+    document.getElementById('blur-overlay').classList.add('active');
   }
 
-  // ... your logic for showing each question ...
-}
+  function hideLoading() {
+    document.getElementById('blur-overlay').classList.remove('active');
+  }
 
+  window.generateQuiz = async function() {
+    const notes = document.getElementById('notes').value.trim();
+    if (!notes) {
+      alert('Please paste some notes first.');
+      return;
+    }
+    lastNotes = notes;
+    showLoading();
 
+    try {
+      const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes, count: selectedCount }),
+      });
 
-      
-
-	    
-      const q = quizData[currentQuestionIndex];
-      const container = document.getElementById('quiz-container');
-      container.innerHTML = `
-        <div class="flashcard">
-          <h3>Question ${currentQuestionIndex + 1} of ${totalCount}</h3>
-          <p>${q.question}</p>
-          <div id="choices">
-            ${q.choices.map(choice =>
-              `<button onclick="checkAnswer('${choice}', this)">${choice}</button>`
-            ).join('')}
-          </div>
-          <p id="feedback" style="font-weight:bold; margin-top:10px;"></p>
-        </div>
-      `;
-    } 
-
-
-	  
-    function checkAnswer(selected, button) {
-      clearTimeout(feedbackTimeout);
-      const q = quizData[currentQuestionIndex];
-      const feedbackEl = document.getElementById('feedback');
-
-      if (selected === q.answer) {
-        feedbackEl.textContent = '✅ Correct!';
-        feedbackEl.style.color = 'green';
-        score += 20; // 5 questions × 20 = 100
-        correctCount++;
-      } else {
-        feedbackEl.textContent = `❌ Wrong! Correct answer: ${q.answer}`;
-        feedbackEl.style.color = 'red';
+      if (!res.ok) {
+        hideLoading();
+        alert('Failed to generate quiz');
+        return;
       }
 
-      // Disable all buttons after answering
-      const buttons = document.querySelectorAll('#choices button');
-      buttons.forEach(btn => btn.disabled = true);
+      const data = await res.json();
+      if (data.error) {
+        hideLoading();
+        alert('Error: ' + data.error);
+        return;
+      }
 
-      // Move to next question automatically after 2 seconds
-      feedbackTimeout = setTimeout(() => {
-        currentQuestionIndex++;
-        showQuestion();
-      }, 2000);
+      quizData = data.quiz;
+      currentQuestionIndex = 0;
+      score = 0;
+      correctCount = 0;
+      totalCount = quizData.length;
+
+      // Optional subject detection & affiliate link
+      const subjectRes = await fetch('/api/subject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes }),
+      });
+
+      let subject = '';
+      if (subjectRes.ok) {
+        const subjectData = await subjectRes.json();
+        subject = subjectData.subject || '';
+      }
+
+      hideLoading();
+      showQuestion();
+
+      if (subject) {
+        const affiliateLink = generateAmazonAffiliateLink(subject);
+        document.getElementById('study-guide-link').innerHTML = `
+          <p>
+            Looking for study guides on <strong>${subject}</strong>?
+            <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" style="color:#8e44ad;">
+              Check out these books on Amazon
+            </a>
+          </p>
+        `;
+      } else {
+        document.getElementById('study-guide-link').innerHTML = '';
+      }
+    } catch (err) {
+      hideLoading();
+      alert('There was an error generating the quiz.');
+      console.error(err);
     }
-  </script>
+  };
+
+  function generateAmazonAffiliateLink(subject) {
+    const baseUrl = 'https://www.amazon.com/s';
+    const params = new URLSearchParams({
+      k: `${subject} study guide`,
+      tag: 'clamtour-20', // your Amazon Associate tag
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  window.downloadPDF = function() {
+    const element = document.getElementById('results');
+    if (!element) return alert('No results to download.');
+    const opt = {
+      margin: 0.5,
+      filename: 'quiz-results.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().from(element).set(opt).save();
+  };
+
+  function showQuestion() {
+    if (currentQuestionIndex >= quizData.length) {
+      const percent = Math.round((score / (totalCount * 20)) * 100);
+
+      if (percent >= 70 && window.confetti) {
+        confetti();
+      }
+
+      document.getElementById('quiz-container').innerHTML = `
+        <div id="results">
+          <h2>🎉 Quiz Complete!</h2>
+          <p>✅ Correct: ${correctCount}</p>
+          <p>❌ Incorrect: ${totalCount - correctCount}</p>
+          <p>🏆 Score: ${percent} / 100</p>
+        </div>
+
+        <button id="retry-btn" onclick="retryQuiz()">Retry</button>
+        <button onclick="downloadPDF()">📄 Download Results</button>
+      `;
+      return;
+    }
+
+    const q = quizData[currentQuestionIndex];
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = `
+      <div class="flashcard">
+        <h3>Question ${currentQuestionIndex + 1} of ${totalCount}</h3>
+        <p>${q.question}</p>
+        <div id="choices">
+          ${q.choices.map(choice =>
+            `<button onclick="checkAnswer('${choice}', this)">${choice}</button>`
+          ).join('')}
+        </div>
+        <p id="feedback" style="font-weight:bold; margin-top:10px;"></p>
+      </div>
+    `;
+  }
+
+  window.checkAnswer = function(selected, button) {
+    clearTimeout(feedbackTimeout);
+    const q = quizData[currentQuestionIndex];
+    const feedbackEl = document.getElementById('feedback');
+
+    if (selected === q.answer) {
+      feedbackEl.textContent = '✅ Correct!';
+      feedbackEl.style.color = 'green';
+      score += 20; // each question worth 20 pts
+      correctCount++;
+    } else {
+      feedbackEl.textContent = `❌ Wrong! Correct answer: ${q.answer}`;
+      feedbackEl.style.color = 'red';
+    }
+
+    // Disable all choice buttons
+    document.querySelectorAll('#choices button').forEach(btn => btn.disabled = true);
+
+    feedbackTimeout = setTimeout(() => {
+      currentQuestionIndex++;
+      showQuestion();
+    }, 2000);
+  };
+</script>
+
 
 <div id="study-guide-link" style="margin-top: 20px;"></div>
 
