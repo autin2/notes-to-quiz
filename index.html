@@ -335,6 +335,35 @@ function retryQuiz() {
     return;
   }
 
+  lastNotes = notes; // store for retry
+  try {
+    const res = await fetch('/api/quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes })
+    });
+
+    const data = await res.json();
+
+    if (!data.questions || data.questions.length === 0) {
+      alert('No quiz questions were generated.');
+      return;
+    }
+
+    quizData = data.questions;
+    currentQuestionIndex = 0;
+    score = 0;
+    correctCount = 0;
+    totalCount = 0;
+
+    showQuestion();
+  } catch (err) {
+    console.error('Error generating quiz:', err);
+    alert('There was an error generating the quiz.');
+  }
+}
+
+
   showLoading();
 
   // Generate quiz
