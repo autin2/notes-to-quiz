@@ -441,7 +441,7 @@
 
     const opt = {
       margin: 0.5,
-      filename: 'quiz-results.pdf',
+      filename: 'quiz.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -467,7 +467,7 @@
         </div>
 
         <button id="retry-btn" onclick="retryQuiz()">Retry</button>
-        <button onclick="downloadQuizPDF()">📄 Download Results</button>
+        <button onclick="downloadQuizPDF()">📄 Download Quiz</button>
       `;
       return;
     }
