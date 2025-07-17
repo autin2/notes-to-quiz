@@ -329,63 +329,78 @@ function retryQuiz() {
 
 
 	
-    async function generateQuiz() {
+async function generateQuiz() {
   const notes = document.getElementById('notes').value.trim();
   if (!notes) {
     alert('Please paste some notes first.');
     return;
   }
 
-  lastNotes = notes; // store for retry
+  showLoading();
+
   try {
     const res = await fetch('/api/quiz', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes })
+      body: JSON.stringify({ notes, count: selectedCount }),
     });
 
-    const data = await res.json();
-
-    if (!data.questions || data.questions.length === 0) {
-      alert('No quiz questions were generated.');
+    if (!res.ok) {
+      hideLoading();
+      alert('Failed to generate quiz');
       return;
     }
 
-    quizData = data.questions;
+    const data = await res.json();
+    if (data.error) {
+      hideLoading();
+      alert('Error: ' + data.error);
+      return;
+    }
+
+    quizData = data.quiz;
     currentQuestionIndex = 0;
     score = 0;
     correctCount = 0;
-    totalCount = 0;
+    totalCount = quizData.length;
 
+    // Optionally get subject & show affiliate link (if you want)
+    const subjectRes = await fetch('/api/subject', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes }),
+    });
+
+    let subject = '';
+    if (subjectRes.ok) {
+      const subjectData = await subjectRes.json();
+      subject = subjectData.subject || '';
+    }
+
+    hideLoading();
     showQuestion();
+
+    if (subject) {
+      const affiliateLink = generateAmazonAffiliateLink(subject);
+      document.getElementById('study-guide-link').innerHTML = `
+        <p>
+          Looking for study guides on <strong>${subject}</strong>?
+          <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" style="color:#8e44ad;">
+            Check out these books on Amazon
+          </a>
+        </p>
+      `;
+    } else {
+      document.getElementById('study-guide-link').innerHTML = '';
+    }
   } catch (err) {
-    console.error('Error generating quiz:', err);
+    hideLoading();
     alert('There was an error generating the quiz.');
+    console.error(err);
   }
 }
 
 
-  showLoading();
-
-  // Generate quiz
-  const res = await fetch('/api/quiz', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ notes, count: selectedCount }),
-  });
-
-  if (!res.ok) {
-    hideLoading();
-    alert('Failed to generate quiz');
-    return;
-  }
-
-  const data = await res.json();
-  if (data.error) {
-    hideLoading();
-    alert('Error: ' + data.error);
-    return;
-  }
 
   quizData = data.quiz;
   currentQuestionIndex = 0;
