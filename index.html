@@ -7,6 +7,7 @@
   <link rel="icon" href="favicon.png" type="image/png" sizes="32x32" />
  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1830306161200087"
      crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 	
   <title>Flashcard Quiz AI</title>
@@ -404,25 +405,47 @@ function generateAmazonAffiliateLink(subject) {
   return `${baseUrl}?${params.toString()}`;
 }
 
+
+	  function downloadPDF() {
+  const element = document.getElementById('results');
+  const opt = {
+    margin:       0.5,
+    filename:     'quiz-results.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().from(element).set(opt).save();
+}
+
+	  
 	  
 	
     function showQuestion() {
-      if (currentQuestionIndex >= quizData.length) {
- 	 const percent = Math.round((score / (totalCount * 20)) * 100); 
-		  if (percent >= 70 && window.confetti) {
-		    confetti();
-		  }
-		document.getElementById('quiz-container').innerHTML = `
-		<h2>🎉 Quiz Complete!</h2>
-		<p>✅ Correct: ${correctCount}</p>
-		<p>❌ Incorrect: ${totalCount - correctCount}</p>
-		<p>🏆 Score: ${percent} / 100</p>
-		
-  
-		<button id="retry-btn" onclick="retryQuiz()">Retry</button>
-		`;
-		return;
-	}
+  if (currentQuestionIndex >= quizData.length) {
+    const percent = Math.round((score / (totalCount * 20)) * 100); 
+
+    if (percent >= 70 && window.confetti) {
+      confetti();
+    }
+
+    document.getElementById('quiz-container').innerHTML = `
+      <div id="results">
+        <h2>🎉 Quiz Complete!</h2>
+        <p>✅ Correct: ${correctCount}</p>
+        <p>❌ Incorrect: ${totalCount - correctCount}</p>
+        <p>🏆 Score: ${percent} / 100</p>
+      </div>
+
+      <button id="retry-btn" onclick="retryQuiz()">Retry</button>
+      <button onclick="downloadPDF()">📄 Download Results</button>
+    `;
+    return;
+  }
+
+  // ... your logic for showing each question ...
+}
+
 
 
       
