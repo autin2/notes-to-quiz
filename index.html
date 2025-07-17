@@ -402,9 +402,43 @@
     return `${baseUrl}?${params.toString()}`;
   }
 
-  window.downloadPDF = function() {
-    const element = document.getElementById('results');
-    if (!element) return alert('No results to download.');
+  // NEW function to download the entire quiz as PDF with questions and answers
+  window.downloadQuizPDF = function() {
+    if (!quizData || quizData.length === 0) {
+      alert("No quiz data to download.");
+      return;
+    }
+
+    const container = document.createElement("div");
+    container.style.padding = "20px";
+    container.style.color = "#000";
+    container.style.fontFamily = "Arial, sans-serif";
+
+    container.innerHTML = `<h1>Quiz Results</h1>`;
+
+    quizData.forEach((q, i) => {
+      const qDiv = document.createElement("div");
+      qDiv.style.marginBottom = "20px";
+
+      const questionElem = document.createElement("h3");
+      questionElem.textContent = `Question ${i + 1}: ${q.question}`;
+      qDiv.appendChild(questionElem);
+
+      const choicesList = document.createElement("ul");
+      q.choices.forEach(choice => {
+        const li = document.createElement("li");
+        li.textContent = choice;
+        if (choice === q.answer) {
+          li.style.fontWeight = "bold";
+          li.style.color = "green";
+        }
+        choicesList.appendChild(li);
+      });
+      qDiv.appendChild(choicesList);
+
+      container.appendChild(qDiv);
+    });
+
     const opt = {
       margin: 0.5,
       filename: 'quiz-results.pdf',
@@ -412,7 +446,8 @@
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    html2pdf().from(element).set(opt).save();
+
+    html2pdf().from(container).set(opt).save();
   };
 
   function showQuestion() {
@@ -432,7 +467,7 @@
         </div>
 
         <button id="retry-btn" onclick="retryQuiz()">Retry</button>
-        <button onclick="downloadPDF()">📄 Download Results</button>
+        <button onclick="downloadQuizPDF()">📄 Download Results</button>
       `;
       return;
     }
@@ -477,6 +512,7 @@
     }, 2000);
   };
 </script>
+
 
 
 <div id="study-guide-link" style="margin-top: 20px;"></div>
